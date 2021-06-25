@@ -87,6 +87,20 @@ function gglobaltick.actions.insert(name, delay, params)
 	})
 end
 
+-- Insert an action into the queue, with a specified delay and factor.
+-- The delay is every <factor>th tick, so that if factor is 3,
+--- a delay of 0 means the next tick divisible by three, 1 means three ticks after that, etc.
+-- The delay will be floored.
+-- The factor must be an integer.
+function gglobaltick.actions.insert_factor(name, factor, delay, params)
+	assert(gglobaltick.actions.actions[name], name .. " is not a registered action")
+	local nt = next_tick()
+	gglobaltick.actions.add_tick_action(nt + math.floor(delay) * factor + (nt % factor), {
+		name = name,
+		params = params,
+	})
+end
+
 function gglobaltick.actions.tick()
 	increment_tick()
 	for action in gglobaltick.actions.iterate_tick_actions(current_tick()) do
